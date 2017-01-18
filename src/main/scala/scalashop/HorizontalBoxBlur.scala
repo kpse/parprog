@@ -44,9 +44,10 @@ object HorizontalBoxBlur {
     * Within each row, `blur` traverses the pixels by going from left to right.
     */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
-    if (from == end) innerBlur(from)
-    else
-      (from until end).foreach(innerBlur)
+    if (from > src.height - 1) return
+    else if (from == end) innerBlur(from)
+    else (from until end).foreach(innerBlur)
+
     def innerBlur(row: Int) = (0 until src.width).foreach(col => dst.update(col, row, boxBlurKernel(src, col, row, radius)))
   }
 
@@ -64,7 +65,6 @@ object HorizontalBoxBlur {
     (0 to src.height).toArray.sliding(sizeOfChunk, stepOfChunk).foreach(arr => task {
       blur(src, dst, arr.head, arr.last, radius)
     })
-    blur(src, dst, src.height - 1, src.height, radius)
   }
 
 }

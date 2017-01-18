@@ -43,9 +43,9 @@ object VerticalBoxBlur {
     * bottom.
     */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
-    if (from == end) innerBlur(from)
-    else
-      (from until end).foreach(innerBlur)
+    if (from > src.width - 1) return
+    else if (end == from) innerBlur(from)
+    else (from until end).foreach(innerBlur)
     def innerBlur(col: Int) = (0 until src.height).foreach(row => dst.update(col, row, boxBlurKernel(src, col, row, radius)))
   }
 
@@ -63,8 +63,6 @@ object VerticalBoxBlur {
     (0 to src.width).toArray.sliding(sizeOfChunk, stepOfChunk).foreach(arr => task {
       blur(src, dst, arr.head, arr.last, radius)
     })
-
-    blur(src, dst, src.width - 1, src.width, radius)
   }
 
 }
