@@ -44,31 +44,25 @@ package object scalashop {
   /** Computes the blurred RGBA value of a single pixel of the input image. */
   def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
     // TODO implement using while loops
-    val startX = clamp(x - radius, 0, src.width)
-    val startY = clamp(y - radius, 0, src.height)
-    val endX = clamp(x + radius, 0, src.width)
-    val endY = clamp(y + radius, 0, src.height)
-    var (cX, cY) = (startX, startY)
+    val startX = clamp(x - radius, 0, src.width - 1)
+    val startY = clamp(y - radius, 0, src.height - 1)
+    val endX = clamp(x + radius, 0, src.width - 1)
+    val endY = clamp(y + radius, 0, src.height - 1)
+
     val pixels: IndexedSeq[(Int, Int)] = for {
       x <- startX to endX
       y <- startY to endY
     } yield (x, y)
 
-    val center: RGBA = src(x, y)
     val size = pixels.size
-    val map: IndexedSeq[RGBA] = pixels
+    val res = pixels
       .map(t => src(t._1, t._2))
-    def op(acc: (Int, Int, Int, Int), i: RGBA) : (Int, Int, Int, Int) = {
-      val i1: Int = red(i) + acc._1
-      val i2: Int = green(i) + acc._2
-      val i3: Int = blue(i) + acc._3
-      val i4: Int = alpha(i) + acc._4
-      (i1, i2, i3, i4)
-    }
-    val res: (Int, Int, Int, Int) = map
-      .foldLeft((0, 0, 0, 0))(op)
-    if (size > 0) rgba(res._1 / size, res._2 / size, res._3 / size, res._4 / size)
-    else center
+      .foldLeft((0, 0, 0, 0))({
+        (acc, i) =>
+          (red(i) + acc._1, green(i) + acc._2, blue(i) + acc._3, alpha(i) + acc._4)
+      })
+    if (pixels.isEmpty) src(x, y)
+    else rgba(res._1 / size, res._2 / size, res._3 / size, res._4 / size)
   }
 
 }
