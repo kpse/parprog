@@ -89,5 +89,102 @@ class BlurSuite extends FunSuite {
     check(3, 2, 6)
   }
 
+  test("VerticalBoxBlur.parBlur should be equal to blur the entire " +
+    "4x3 image") {
+    val w = 4
+    val h = 3
+    val src = new Img(w, h)
+    val dst = new Img(w, h)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2; src(3, 0) = 9
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5; src(3, 1) = 10
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8; src(3, 2) = 11
+
+
+    for (x <- 0 until w) {
+      VerticalBoxBlur.blur(src, dst, 0, src.width, 2)
+    }
+
+    val dst2 = new Img(w, h)
+
+    VerticalBoxBlur.parBlur(src, dst2, 1, 2)
+
+    for (x <- 0 until w; y <- 0 until h) {
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst2(x, y)})")
+    }
+  }
+
+  test("VerticalBoxBlur.parBlur with 2 tasks should be equal to blur the entire " +
+    "4x3 image") {
+    val w = 4
+    val h = 3
+    val src = new Img(w, h)
+    val dst = new Img(w, h)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2; src(3, 0) = 9
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5; src(3, 1) = 10
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8; src(3, 2) = 11
+
+
+    for (x <- 0 until w) {
+      VerticalBoxBlur.blur(src, dst, 0, src.width, 2)
+    }
+
+    val dst2 = new Img(w, h)
+
+    VerticalBoxBlur.parBlur(src, dst2, 2, 2)
+
+    for (x <- 0 until w; y <- 0 until h) {
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst2(x, y)})")
+    }
+  }
+
+
+  test("HorizontalBoxBlur.parBlur should be equal to blur the entire " +
+    "4x3 image") {
+    val w = 4
+    val h = 3
+    val src = new Img(w, h)
+    val dst = new Img(w, h)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2; src(3, 0) = 9
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5; src(3, 1) = 10
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8; src(3, 2) = 11
+
+
+    for (x <- 0 until h) {
+      HorizontalBoxBlur.blur(src, dst, 0, src.height, 2)
+    }
+
+    val dst2 = new Img(w, h)
+
+    HorizontalBoxBlur.parBlur(src, dst2, 1, 2)
+
+    for (x <- 0 until w; y <- 0 until h) {
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst2(x, y)})")
+    }
+  }
+
+  test("HorizontalBoxBlur.parBlur with 2 tasks should be equal to blur the entire " +
+    "4x3 image") {
+    val w = 4
+    val h = 3
+    val src = new Img(w, h)
+    val dst = new Img(w, h)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2; src(3, 0) = 9
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5; src(3, 1) = 10
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8; src(3, 2) = 11
+
+
+    for (x <- 0 until h) {
+      HorizontalBoxBlur.blur(src, dst, 0, src.height, 2)
+    }
+
+    val dst2 = new Img(w, h)
+
+    HorizontalBoxBlur.parBlur(src, dst2, 2, 2)
+
+    for (x <- 0 until w; y <- 0 until h) {
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst2(x, y)})")
+    }
+  }
+
 
 }

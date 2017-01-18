@@ -44,7 +44,10 @@ object HorizontalBoxBlur {
     * Within each row, `blur` traverses the pixels by going from left to right.
     */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
-    (from until end).foreach(row => (0 until src.width).foreach(col => dst.update(col, row, boxBlurKernel(src, col, row, radius))))
+    if (from == end) innerBlur(from)
+    else
+      (from until end).foreach(innerBlur)
+    def innerBlur(row: Int) = (0 until src.width).foreach(col => dst.update(col, row, boxBlurKernel(src, col, row, radius)))
   }
 
   /** Blurs the rows of the source image in parallel using `numTasks` tasks.
@@ -54,8 +57,14 @@ object HorizontalBoxBlur {
     * rows.
     */
   def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
-    if(numTasks == 0) throw new IllegalArgumentException("cannot split into 0 tasks")
-    (0 until src.height).toArray.sliding(src.width/numTasks, src.width/numTasks - 1).foreach(arr => task {blur(src, dst, arr.head, arr.last, radius)})
+    if (numTasks == 0) throw new IllegalArgumentException("cannot split into 0 tasks")
+    val tasksCount = Integer.min(numTasks, src.width)
+    val sizeOfChunk: Int = src.width / tasksCount
+    val stepOfChunk: Int = if (sizeOfChunk > 1) sizeOfChunk - 1 else 1
+    (0 to src.height).toArray.sliding(sizeOfChunk, stepOfChunk).foreach(arr => task {
+      blur(src, dst, arr.head, arr.last, radius)
+    })
+    blur(src, dst, src.height - 1, src.height, radius)
   }
 
 }
