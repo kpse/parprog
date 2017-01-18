@@ -1,5 +1,7 @@
 package scalashop
 
+import java.util.concurrent.ForkJoinTask
+
 import common._
 import org.scalameter._
 
@@ -60,9 +62,9 @@ object VerticalBoxBlur {
     val tasksCount = Integer.min(numTasks, src.width)
     val sizeOfChunk: Int = src.width / tasksCount
     val stepOfChunk: Int = if (sizeOfChunk > 1) sizeOfChunk - 1 else 1
-    (0 to src.width).toArray.sliding(sizeOfChunk, stepOfChunk).foreach(arr => task {
+    (0 to src.width).toArray.sliding(sizeOfChunk, stepOfChunk).map(arr => task {
       blur(src, dst, arr.head, arr.last, radius)
-    })
+    }).foreach(x => x.join())
   }
 
 }

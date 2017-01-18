@@ -1,11 +1,8 @@
 package scalashop
 
-import java.util.concurrent._
-import scala.collection._
-import org.scalatest.FunSuite
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import common._
 
 @RunWith(classOf[JUnitRunner])
 class BlurSuite extends FunSuite {
@@ -106,7 +103,7 @@ class BlurSuite extends FunSuite {
     VerticalBoxBlur.parBlur(src, dst2, 1, 2)
 
     for (x <- 0 until w; y <- 0 until h) {
-      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst2(x, y)})")
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst(x, y)})")
     }
   }
 
@@ -131,6 +128,47 @@ class BlurSuite extends FunSuite {
     }
   }
 
+  test("VerticalBoxBlur.parBlur with 1 task should be equal to blur the entire " +
+    "3x3 image") {
+    val w = 3
+    val h = 3
+    val src = new Img(w, h)
+    val dst = new Img(w, h)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8
+
+    VerticalBoxBlur.blur(src, dst, 0, src.width, 1)
+
+    val dst2 = new Img(w, h)
+
+    VerticalBoxBlur.parBlur(src, dst2, 1, 1)
+
+    for (x <- 0 until w; y <- 0 until h) {
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst(x, y)})")
+    }
+  }
+
+  test("HorizontalBoxBlur.parBlur with 1 task should be equal to blur the entire " +
+    "3x3 image") {
+    val w = 3
+    val h = 3
+    val src = new Img(w, h)
+    val dst = new Img(w, h)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8
+
+    HorizontalBoxBlur.blur(src, dst, 0, src.height, 1)
+
+    val dst2 = new Img(w, h)
+
+    HorizontalBoxBlur.parBlur(src, dst2, 1, 1)
+
+    for (x <- 0 until w; y <- 0 until h) {
+      assert(dst(x, y) == dst2(x, y), s"(destination($x, $y) should be ${dst(x, y)})")
+    }
+  }
 
   test("HorizontalBoxBlur.parBlur should be equal to blur the entire " +
     "4x3 image") {
