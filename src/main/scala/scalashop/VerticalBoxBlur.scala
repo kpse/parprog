@@ -43,7 +43,6 @@ object VerticalBoxBlur {
    *  bottom.
    */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
-    // TODO implement this method using the `boxBlurKernel` method
     (from until end).foreach(col => (0 until src.height).foreach(row => dst.update(col, row, boxBlurKernel(src, col, row, radius))))
   }
 
@@ -54,8 +53,8 @@ object VerticalBoxBlur {
    *  columns.
    */
   def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
-    // TODO implement using the `task` construct and the `blur` method
-    ???
+    if(numTasks == 0) throw new IllegalArgumentException("cannot split into 0 tasks")
+    (0 until src.width).toArray.sliding(src.height / numTasks, src.height / numTasks).foreach(arr => task {blur(src, dst, arr.head, arr.last, radius)})
   }
 
 }
