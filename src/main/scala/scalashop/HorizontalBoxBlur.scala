@@ -55,7 +55,7 @@ object HorizontalBoxBlur {
     */
   def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
     if(numTasks == 0) throw new IllegalArgumentException("cannot split into 0 tasks")
-    (0 until src.height).toArray.sliding(src.width/numTasks, src.width/numTasks).foreach(arr => task {blur(src, dst, arr.head, arr.last, radius)})
+    (0 until src.height).toArray.sliding(src.width/numTasks, src.width/numTasks - 1).foreach(arr => task {blur(src, dst, arr.head, arr.last, radius)})
   }
 
 }
